@@ -79,7 +79,7 @@ nav.scrolled { box-shadow:0 4px 24px rgba(0,0,0,.5); }
 .liga-pill { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:900; letter-spacing:1px; text-transform:uppercase; padding:2px 7px; background:var(--red); color:#fff; }
 
 /* Hamburger */
-.hamburger { display:none; background:none; border:none; cursor:pointer; padding:12px; flex-direction:column; gap:5px; }
+.hamburger { display:flex; background:none; border:none; cursor:pointer; padding:12px; flex-direction:column; gap:5px; }
 .hamburger span { display:block; width:22px; height:2px; background:#fff; transition:transform .2s,opacity .2s; }
 .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
 .hamburger.open span:nth-child(2) { opacity:0; }
@@ -90,17 +90,26 @@ nav.scrolled { box-shadow:0 4px 24px rgba(0,0,0,.5); }
 .mobile-menu a:hover { background:var(--red); }
 
 /* ── SCORES BAR ── */
-.scores-bar { background:#141414; display:flex; overflow-x:auto; scrollbar-width:none; border-bottom:1px solid #222; }
+.scores-bar { background:#141414; display:flex; overflow-x:auto; overflow-y:hidden; border-bottom:1px solid #222; scrollbar-width:none; -webkit-overflow-scrolling:touch; touch-action:pan-x; scroll-snap-type:x proximity; }
 .scores-bar::-webkit-scrollbar { display:none; }
+.scores-track { display:flex; width:max-content; animation:scoremarq 70s linear infinite; will-change:transform; }
+.scores-bar:hover .scores-track, .scores-bar.is-paused .scores-track { animation-play-state:paused; }
 .score-chip { display:flex; align-items:center; gap:8px; padding:8px 20px; border-right:1px solid #222; white-space:nowrap; flex-shrink:0; cursor:pointer; transition:background .15s; }
 .score-chip:hover { background:#1e1e1e; }
+.score-chip { scroll-snap-align:start; }
 .score-teams { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:#bbb; letter-spacing:.5px; }
 .score-result { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:900; color:#fff; letter-spacing:1px; }
 .score-min { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; color:var(--red); letter-spacing:1px; }
 .score-status { font-family:'Barlow Condensed',sans-serif; font-size:9px; color:#444; letter-spacing:1px; text-transform:uppercase; }
 .live-dot { width:6px; height:6px; background:var(--red); border-radius:50%; animation:lpulse 1.2s ease-in-out infinite; flex-shrink:0; }
 .liga-badge-2bl { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:900; letter-spacing:2px; color:#e67e00; margin-right:8px; }
+.liga-badge-1bl { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:900; letter-spacing:2px; color:#0057b8; margin-right:8px; }
 @keyframes lpulse { 0%,100% { opacity:1;transform:scale(1) } 50% { opacity:.4;transform:scale(.7) } }
+@keyframes scoremarq { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
+
+@media (hover:none) {
+  .scores-track { animation:none; }
+}
 
 /* ── FILTER BAR ── */
 .filter-bar { background:var(--red); padding:10px 48px; display:none; align-items:center; justify-content:space-between; }
@@ -206,7 +215,7 @@ nav.scrolled { box-shadow:0 4px 24px rgba(0,0,0,.5); }
 .hot-left { padding:52px; display:flex; flex-direction:column; justify-content:flex-end; border-right:1px solid #222; }
 .hot-label { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--red); margin-bottom:16px; display:flex; align-items:center; gap:10px; }
 .hot-label::before { content:''; width:28px; height:2px; background:var(--red); }
-.hot-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:58px; line-height:.93; color:#fff; text-transform:uppercase; letter-spacing:-1.5px; }
+.hot-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:58px; line-height:.93; color:#fff; text-transform:uppercase; letter-spacing:3px; }
 .hot-title em { font-style:italic; color:var(--red); font-family:'Playfair Display',serif; }
 .hot-sub { font-size:15px; color:rgba(255,255,255,.55); margin-top:16px; max-width:480px; line-height:1.5; }
 .hot-byline { margin-top:24px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.3); }
@@ -307,13 +316,13 @@ nav.scrolled { box-shadow:0 4px 24px rgba(0,0,0,.5); }
 /* ── WIR PAGE ── */
 .wir-hero { background:var(--ink); padding:80px 52px; text-align:center; position:relative; overflow:hidden; }
 .wir-hero::before { content:'FUSSBALL'; position:absolute; font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:200px; color:rgba(255,255,255,.025); top:50%; left:50%; transform:translate(-50%,-50%); letter-spacing:-10px; white-space:nowrap; pointer-events:none; text-transform:uppercase; }
-.wir-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:80px; color:#fff; text-transform:uppercase; line-height:.88; letter-spacing:-3px; position:relative; }
+.wir-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:80px; color:#fff; text-transform:uppercase; line-height:.88; letter-spacing:2px; position:relative; }
 .wir-title span { color:var(--red); }
 .wir-sub { font-size:16px; color:rgba(255,255,255,.5); margin-top:20px; max-width:560px; margin-left:auto; margin-right:auto; line-height:1.6; position:relative; }
 .wir-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); }
 .wir-block { background:var(--card-bg); padding:44px; }
 .wb-label { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--red); margin-bottom:16px; }
-.wb-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:34px; text-transform:uppercase; line-height:1.02; margin-bottom:16px; color:var(--text); }
+.wb-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:34px; text-transform:uppercase; line-height:1.02; margin-bottom:16px; color:var(--text); letter-spacing:2px; }
 .wir-block p { font-size:14px; color:var(--mid); line-height:1.65; margin-bottom:12px; }
 .wir-team { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-top:none; }
 .team-m { background:var(--card-bg); padding:32px 24px; text-align:center; transition:background .15s; }
@@ -326,9 +335,11 @@ nav.scrolled { box-shadow:0 4px 24px rgba(0,0,0,.5); }
 .nl-block-sub { font-size:14px; color:rgba(255,255,255,.72); margin-top:6px; }
 
 /* ── FOOTER ── */
-#back-top { position:fixed; bottom:28px; right:28px; background:var(--red); color:#fff; border:none; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; opacity:0; pointer-events:none; transition:opacity .3s,transform .3s; z-index:500; }
+#back-top { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:var(--red); color:#fff; border:none; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; opacity:0; pointer-events:none; transition:opacity .3s,transform .3s; z-index:500; }
 #back-top.visible { opacity:1; pointer-events:auto; }
-#back-top:hover { transform:translateY(-3px); }
+#back-top:hover { transform:translateX(-50%) translateY(-3px); }
+.page-title-inline { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:96px; line-height:.92; color:#fff; text-transform:uppercase; letter-spacing:4px; white-space:nowrap; }
+.hist-year { color:var(--red); margin-left:10px; }
 footer { background:var(--ink); color:rgba(255,255,255,.35); padding:32px 52px; display:flex; justify-content:space-between; align-items:center; font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; border-top:3px solid #222; }
 footer a { color:rgba(255,255,255,.35); text-decoration:none; transition:color .15s; }
 footer a:hover { color:#fff; }
@@ -359,7 +370,7 @@ footer a:hover { color:#fff; }
   .wir-team { grid-template-columns:1fr 1fr; } .nl-block { grid-template-columns:1fr; gap:20px; padding:28px 20px; }
   footer { flex-direction:column; gap:16px; text-align:center; padding:24px 20px; } .footer-soc { display:none; }
   .filter-bar { padding:10px 20px; } .nl-inline { flex-direction:column; padding:24px 20px; }
-  .scores-bar { display:none; } .wir-title { font-size:52px; }
+  .scores-bar { display:flex; } .wir-title { font-size:52px; } .page-title-inline { font-size:52px; }
   .hot-left { padding:32px 24px; } .hot-title { font-size:40px; } .search-wrap { display:none; }
   .tabelle-banner { padding:28px 20px; } .tabelle-banner-title { font-size:36px; }
   .matchday-header { padding:14px 20px; } .matches-grid { grid-template-columns:1fr 1fr; }

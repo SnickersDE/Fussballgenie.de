@@ -1,7 +1,7 @@
 <header>
   <div class="header-top">
     <div>
-      <a class="logo" href="{{ "/" | relURL }}" onclick="window.location.href=this.href; return false;">
+      <a class="logo" href="{{ .Site.Home.RelPermalink }}" onclick="window.location.href='{{ .Site.Home.RelPermalink }}'; return false;">
         FUSSBALLGENIE<span class="accent">.DE</span>
       </a>
     </div>
@@ -22,18 +22,13 @@
       <div class="nav-left">
 
         <div class="nav-item">
-          <a class="nav-btn{{ if .IsHome }} active{{ end }}" href="{{ "/" | relURL }}">
+          <a class="nav-btn{{ if .IsHome }} active{{ end }}" href="{{ .Site.Home.RelPermalink }}">
             Start
           </a>
         </div>
         <div class="nav-item">
-          <a class="nav-btn{{ if eq .RelPermalink "/tabelle/" }} active{{ end }}" href="{{ (print "tabelle/" "?liga=bl1") | relURL }}">
-            Tabelle 1. Bundesliga
-          </a>
-        </div>
-        <div class="nav-item">
-          <a class="nav-btn{{ if eq .RelPermalink "/tabelle/" }} active{{ end }}" href="{{ (print "tabelle/" "?liga=bl2") | relURL }}">
-            Tabelle 2. Bundesliga
+          <a class="nav-btn{{ if eq .RelPermalink "/tabelle/" }} active{{ end }}" href="{{ "tabelle/" | relURL }}">
+            Tabelle
           </a>
         </div>
         <div class="nav-item">
@@ -75,9 +70,8 @@
   </nav>
 
   <div class="mobile-menu" id="mobileMenu">
-    <a href="{{ "/" | relURL }}">Start</a>
-    <a href="{{ (print "tabelle/" "?liga=bl1") | relURL }}">Tabelle 1. Bundesliga</a>
-    <a href="{{ (print "tabelle/" "?liga=bl2") | relURL }}">Tabelle 2. Bundesliga</a>
+    <a href="{{ .Site.Home.RelPermalink }}">Start</a>
+    <a href="{{ "tabelle/" | relURL }}">Tabelle</a>
     <a href="{{ "champions-league/" | relURL }}">Champions League</a>
     <a href="{{ "1-bundesliga/" | relURL }}">1. Bundesliga</a>
     <a href="{{ "2-bundesliga/" | relURL }}">2. Bundesliga</a>

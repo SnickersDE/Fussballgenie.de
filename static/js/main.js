@@ -19,8 +19,11 @@ let searchIndex = [];
 
 window.addEventListener('DOMContentLoaded', () => {
   loadLiveTicker();
+  loadLatestResultsCarousel();
+  initSmartScoresCarousel();
   loadSearchIndex();
   setInterval(loadLiveTicker, 60000);
+  setInterval(loadLatestResultsCarousel, 180000);
 });
 
 async function loadLiveTicker() {
@@ -69,6 +72,103 @@ function buildTickerLines(matches, badge) {
     }
     return `${badge} ${t1} vs ${t2} — ${kickoff}`;
   });
+}
+
+async function loadLatestResultsCarousel() {
+  const track = document.getElementById('scoresTrack');
+  if (!track) return;
+
+  try {
+    const [bl1Season, bl2Season] = await Promise.all([
+      fetch(`${LIVE_API}/getmatchdata/bl1/2025/26`).then(r => r.ok ? r.json() : []),
+      fetch(`${LIVE_API}/getmatchdata/bl2/2025/26`).then(r => r.ok ? r.json() : [])
+    ]);
+
+    const bl1Last = pickLatestFinishedMatchday(bl1Season);
+    const bl2Last = pickLatestFinishedMatchday(bl2Season);
+
+    const chips = [
+      ...buildResultChips(bl1Last, '1.BL'),
+      ...buildResultChips(bl2Last, '2.BL')
+    ];
+
+    const safe = chips.length ? chips : ['<div class="score-chip"><div class="score-teams">Keine aktuellen Ergebnisse verfügbar</div></div>'];
+    track.innerHTML = [...safe, ...safe].join('');
+  } catch (err) {
+    track.innerHTML = '<div class="score-chip"><div class="score-teams">Ergebnisse derzeit nicht verfügbar</div></div>';
+  }
+}
+
+function pickLatestFinishedMatchday(matches) {
+  const finished = (matches || []).filter(m => m.matchIsFinished && m.group?.groupOrderID);
+  if (!finished.length) return [];
+  const latestOrder = Math.max(...finished.map(m => m.group.groupOrderID));
+  return finished
+    .filter(m => m.group?.groupOrderID === latestOrder)
+    .sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+}
+
+function buildResultChips(matches, badge) {
+  return (matches || []).map(match => {
+    const t1 = escapeHtml(match.team1?.shortName || match.team1?.teamName || 'Team 1');
+    const t2 = escapeHtml(match.team2?.shortName || match.team2?.teamName || 'Team 2');
+    const result = getResult(match) || '—:—';
+    const has2BL = badge === '2.BL';
+    const dt = match.matchDateTime ? new Date(match.matchDateTime) : null;
+    const dateText = dt ? dt.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' }) : '--.--';
+    return `
+      <div class="score-chip">
+        ${has2BL ? '<span class="liga-badge-2bl">2.BL</span>' : '<span class="liga-badge-1bl">1.BL</span>'}
+        <div class="score-teams">${t1} – ${t2}</div>
+        <div class="score-result">${result}</div>
+        <div class="score-min">FT ${dateText}</div>
+      </div>`;
+  });
+}
+
+function initSmartScoresCarousel() {
+  const bar = document.getElementById('scoresBar');
+  if (!bar) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouchOnly = window.matchMedia('(hover: none)').matches;
+  let touchStartX = 0;
+  let touchStartScroll = 0;
+  let touchActive = false;
+
+  const pause = () => bar.classList.add('is-paused');
+  const resume = () => {
+    if (!reduceMotion && !isTouchOnly) bar.classList.remove('is-paused');
+  };
+
+  bar.addEventListener('mouseenter', pause);
+  bar.addEventListener('mouseleave', resume);
+  bar.addEventListener('focusin', pause);
+  bar.addEventListener('focusout', resume);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pause();
+    else resume();
+  });
+
+  bar.addEventListener('touchstart', (e) => {
+    if (!e.touches.length) return;
+    touchActive = true;
+    pause();
+    touchStartX = e.touches[0].clientX;
+    touchStartScroll = bar.scrollLeft;
+  }, { passive: true });
+
+  bar.addEventListener('touchmove', (e) => {
+    if (!touchActive || !e.touches.length) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    bar.scrollLeft = touchStartScroll - dx;
+  }, { passive: true });
+
+  bar.addEventListener('touchend', () => {
+    touchActive = false;
+    setTimeout(resume, 350);
+  }, { passive: true });
 }
 
 function getResult(match) {
@@ -260,7 +360,7 @@ window.addEventListener('scroll', () => {
 
   // Back to top
   const btn = document.getElementById('back-top');
-  if (btn) btn.classList.toggle('visible', s > 400);
+  if (btn) btn.classList.toggle('visible', d > 0 && s >= (d - 24));
 });
 
 /* ── COPY LINK ── */

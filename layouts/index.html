@@ -1,10 +1,14 @@
 {{ define "main" }}
 
+{{ $allArticles := where .Site.RegularPages "Section" "artikel" }}
+{{ $allArticles = sort $allArticles "Date" "desc" }}
+
 <!-- ══════════════════════════════════════
      HERO
 ══════════════════════════════════════ -->
 <div class="hero">
-  <div class="hero-main filterable" data-league="1. Bundesliga" data-title="1. bundesliga kane schiesst münchen zum sieg im klassiker">
+  {{ $hero := index $allArticles 0 }}
+  <div class="hero-main filterable" onclick="window.location.href='{{ $hero.RelPermalink }}'" data-league="{{ $hero.Params.liga }}" data-title="{{ $hero.Params.liga | lower }} {{ $hero.Title | lower }}">
     <div class="hero-badge">Breaking</div>
     <div class="hero-pic shimmer">
       <svg style="position:absolute;bottom:0;left:0;width:100%;height:100%;opacity:.07;" viewBox="0 0 900 540" preserveAspectRatio="none">
@@ -16,33 +20,23 @@
       </svg>
     </div>
     <div class="hero-content">
-      <div class="hero-category">1. Bundesliga · 26. Spieltag</div>
-      <div class="hero-title">KANE SCHIESST MÜNCHEN<br>ZUM SIEG IM KLASSIKER</div>
-      <div class="hero-sub">Zweimal Harry Kane — der FC Bayern dreht das Spitzenspiel gegen BVB in der zweiten Hälfte und bleibt Tabellenführer der 1. Bundesliga.</div>
-      <div class="hero-meta">Von Max Müller · Heute, 20:41 Uhr · 4 Min.</div>
+      <div class="hero-category">{{ $hero.Params.liga }}</div>
+      <div class="hero-title">{{ $hero.Title | upper }}</div>
+      <div class="hero-sub">{{ $hero.Params.teaser }}</div>
+      <div class="hero-meta">Von {{ $hero.Params.author | default "Redaktion" }} · {{ $hero.Date.Format "02.01.2006 · 15:04" }} · {{ $hero.Params.lesezeit | default "3" }} Min.</div>
     </div>
   </div>
   <div class="hero-sidebar">
-    <div class="hero-side-item filterable" data-league="1. Bundesliga" data-title="1. bundesliga xabi alonso verlängert">
-      <div class="side-thumb-ph shimmer" style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a);"></div>
-      <div><div class="side-cat">1. Bundesliga</div><div class="side-title">Xabi Alonso verlängert bis 2028 — offiziell!</div><div class="side-date">Heute · 18:15 · 2 Min.</div></div>
-    </div>
-    <div class="hero-side-item filterable" data-league="1. Bundesliga" data-title="1. bundesliga wirtz entscheidung april">
-      <div class="side-thumb-ph shimmer" style="background:linear-gradient(135deg,#1a2a1a,#0a1a0a);"></div>
-      <div><div class="side-cat">1. Bundesliga Transfer</div><div class="side-title">1. Bundesliga: Wirtz-Entscheidung bis Ende April</div><div class="side-date">Heute · 16:02 · 3 Min.</div></div>
-    </div>
-    <div class="hero-side-item filterable" data-league="1. Bundesliga" data-title="1. bundesliga frankfurt halbfinale pokal">
-      <div class="side-thumb-ph shimmer" style="background:linear-gradient(135deg,#2a1a1a,#1a0a0a);"></div>
-      <div><div class="side-cat">1. Bundesliga Pokal</div><div class="side-title">1. Bundesliga: Frankfurt im Halbfinale dramatisch</div><div class="side-date">Gestern · 22:55 · 3 Min.</div></div>
-    </div>
-    <div class="hero-side-item filterable" data-league="2. Bundesliga" data-title="2. bundesliga hamburger sv tabellenführer">
-      <div class="side-thumb-ph shimmer" style="background:linear-gradient(135deg,#1a1a2a,#0a0a1a);"></div>
-      <div><div class="side-cat">2. Bundesliga</div><div class="side-title">2. Bundesliga: HSV wieder Tabellenführer</div><div class="side-date">Gestern · 20:30 · 2 Min.</div></div>
-    </div>
-    <div class="hero-side-item filterable" data-league="2. Bundesliga" data-title="2. bundesliga kiel gewinnt aufstiegsrennen">
-      <div class="side-thumb-ph shimmer" style="background:linear-gradient(135deg,#1a2a2a,#0a1a1a);"></div>
-      <div><div class="side-cat">2. Bundesliga</div><div class="side-title">2. Bundesliga: Kiel gewinnt — Aufstiegsrennen heißer denn je</div><div class="side-date">16. März · 18:30 · 2 Min.</div></div>
-    </div>
+    {{ range first 5 (after 1 $allArticles) }}
+      <div class="hero-side-item filterable" onclick="window.location.href='{{ .RelPermalink }}'" data-league="{{ .Params.liga }}" data-title="{{ .Params.liga | lower }} {{ .Title | lower }}">
+        <div class="side-thumb-ph shimmer"></div>
+        <div>
+          <div class="side-cat">{{ .Params.liga }}</div>
+          <div class="side-title">{{ .Title }}</div>
+          <div class="side-date">{{ .Date.Format "02.01. · 15:04" }} · {{ .Params.lesezeit | default "3" }} Min.</div>
+        </div>
+      </div>
+    {{ end }}
   </div>
 </div>
 
@@ -52,9 +46,7 @@
 <div class="container"><div class="section-label">Aktuelle Meldungen</div></div>
 <div class="main-grid" id="articleGrid">
 
-  {{ $articlePages := where .Site.RegularPages "Section" "artikel" }}
-  {{ $articlePages = sort $articlePages "Date" "desc" }}
-  {{ $paginator := .Paginate $articlePages }}
+  {{ $paginator := .Paginate $allArticles }}
   {{ range $paginator.Pages }}
     {{ if eq .Section "artikel" }}
     <div class="card filterable"
@@ -117,30 +109,14 @@
 
 <!-- Strip -->
 <div class="strip">
-  <div class="strip-card filterable" data-league="1. Bundesliga" data-title="1. bundesliga kommentar bundesliga neu erfinden">
-    <div class="card-cat c-me"><span class="cdot cd-me"></span>Meinung</div>
-    <div class="card-title">Kommentar: 1. Bundesliga muss sich neu erfinden</div>
-    <div class="card-excerpt">TV-Gelder, Investoren, Identität — der deutsche Fußball steht am Scheideweg.</div>
-    <div class="card-foot"><div class="card-meta">16. März</div><div class="read-time">6 Min.</div></div>
-  </div>
-  <div class="strip-card filterable" data-league="1. Bundesliga" data-title="1. bundesliga neuer verletzt münchen torwart">
-    <div class="card-cat c-bl"><span class="cdot cd-bl"></span>1. Bundesliga</div>
-    <div class="card-title">1. Bundesliga: Neuer verletzt — Bayern sucht Lösung</div>
-    <div class="card-excerpt">Wer hütet das Bayern-Tor? Drei Namen sind im Gespräch.</div>
-    <div class="card-foot"><div class="card-meta">Gestern · 12:00</div><div class="read-time">2 Min.</div></div>
-  </div>
-  <div class="strip-card filterable" data-league="2. Bundesliga" data-title="2. bundesliga fortuna düsseldorf niederlagen abstieg">
-    <div class="card-cat c-2bl"><span class="cdot cd-2bl"></span>2. Bundesliga</div>
-    <div class="card-title">2. Bundesliga: Fortuna verliert Anschluss nach 3 Niederlagen</div>
-    <div class="card-excerpt">Nach drei Niederlagen in Folge droht der Abstieg für den einstigen Erstligisten.</div>
-    <div class="card-foot"><div class="card-meta">15. März</div><div class="read-time">3 Min.</div></div>
-  </div>
-  <div class="strip-card filterable" data-league="1. Bundesliga" data-title="1. bundesliga statistik scorer rueckrunde kane musiala simons">
-    <div class="card-cat c-def"><span class="cdot cd-def"></span>Statistik</div>
-    <div class="card-title"><a href="{{ "artikel/mein-artikel-titel/" | relURL }}">1. Bundesliga: Kane, Musiala, Simons — Scorer der Rückrunde</a></div>
-    <div class="card-excerpt">Die Zahlen der 1. Bundesliga Rückrunde 2026 — datenbasiertes Ranking.</div>
-    <div class="card-foot"><div class="card-meta">16. März · 11:20</div><div class="read-time">4 Min.</div></div>
-  </div>
+  {{ range first 4 (after 6 $allArticles) }}
+    <div class="strip-card filterable" onclick="window.location.href='{{ .RelPermalink }}'" data-league="{{ .Params.liga }}" data-title="{{ .Params.liga | lower }} {{ .Title | lower }}">
+      <div class="card-cat {{ .Params.cat_class | default "c-def" }}"><span class="cdot {{ .Params.cd_class | default "cd-def" }}"></span>{{ .Params.liga }}</div>
+      <div class="card-title">{{ .Title }}</div>
+      <div class="card-excerpt">{{ .Params.teaser }}</div>
+      <div class="card-foot"><div class="card-meta">{{ .Date.Format "02.01. · 15:04" }}</div><div class="read-time">{{ .Params.lesezeit | default "3" }} Min.</div></div>
+    </div>
+  {{ end }}
 </div>
 
 <div id="noResults">

@@ -4,6 +4,7 @@
 
 const API = 'https://api.openligadb.de';
 let currentLiga = 'bl1';
+const CURRENT_SEASON = 2025;
 
 /* ── Init on page load ── */
 window.addEventListener('DOMContentLoaded', () => {
@@ -35,7 +36,7 @@ async function loadLiga(liga) {
   showSkeleton();
   try {
     const [tableData, matchData] = await Promise.all([
-      fetchJSON(`${API}/getbltable/${liga}/2024`),
+      fetchJSON(`${API}/getbltable/${liga}/${CURRENT_SEASON}`),
       fetchJSON(`${API}/getmatchdata/${liga}`)
     ]);
     renderTable(tableData, liga);
